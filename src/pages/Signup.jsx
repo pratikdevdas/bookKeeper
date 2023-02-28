@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthState } from "react-firebase-hooks/auth";
 import {
   Card,
   CardHeader,
@@ -10,18 +11,26 @@ import {
   Button,
   Typography,
 } from "@material-tailwind/react";
-import { useNavigate } from "react-router-dom";
 import { SimpleFooter } from "@/components/layout";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  auth,
+  registerWithEmailAndPassword,
+  signInWithGoogle,
+} from "../firebase";
 
-export function SignIn() {
+export function SignUp() {
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [user, loading, error] = useAuthState(auth);
   const navigate = useNavigate();
 
+  const handleName = (e) => {
+    setName(e.target.value);
+  };
+
   const handleEmail = (e) => {
-    console.log(e.target.value);
     setEmail(e.target.value);
   };
 
@@ -29,22 +38,19 @@ export function SignIn() {
     setPassword(e.target.value);
   };
 
-  const onSignIn = (e) => {
+  const onSubmit = (e) => {
     e.preventDefault();
-    console.log(email);
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-        navigate("/profile");
-        console.log(user);
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
-      });
+    if (!name) alert("Please Enter Name");
+    registerWithEmailAndPassword(name, email, password);
   };
+  useEffect(() => {
+    if (loading) return;
+    if(user){
+      console.log(user,'user');
+      navigate('/profile')
+    }
+  }, [user, loading]);
+
   return (
     <>
       <img
@@ -60,46 +66,58 @@ export function SignIn() {
             className="mb-4 grid h-28 place-items-center"
           >
             <Typography variant="h3" color="white">
-              Sign In
+              Sign Up
             </Typography>
           </CardHeader>
-          <CardBody className="flex flex-col gap-4">
-            <form onSubmit={onSignIn}>
+          <form onSubmit={onSubmit}>
+            <CardBody className="flex flex-col gap-4">
               <Input
-                value={email}
-                onChange={handleEmail}
+                variant="standard"
+                value={name}
+                onChange={handleName}
+                label="Name"
+                size="lg"
+              />
+              <Input
                 variant="standard"
                 type="email"
+                value={email}
+                onChange={handleEmail}
                 label="Email"
                 size="lg"
               />
               <Input
+                value={password}
+                onChange={handlePassword}
                 variant="standard"
                 type="password"
                 label="Password"
                 size="lg"
-                value={password}
-                onChange={handlePassword}
               />
               <div className="-ml-2.5">
-                <Checkbox label="Remember Me" />
+                <Checkbox label="I agree the Terms and Conditions" />
               </div>
-            <Button type="submit" variant="gradient" fullWidth >
-              Sign In
-            </Button>
-            </form>
-          </CardBody>
+              <Button type="submit" variant="gradient" fullWidth >
+              Sign Up
+            </Button>OR
+            </CardBody>
+            
+          </form>
           <CardFooter className="pt-0">
+            <Button onClick={signInWithGoogle} variant="gradient" fullWidth>
+              Sign in With Google
+            </Button>
+ 
             <Typography variant="small" className="mt-6 flex justify-center">
-              Don't have an account?
-              <Link to="/sign-up">
+              Already have an account?
+              <Link to="/login">
                 <Typography
-                as="span"
+                  as="span"
                   variant="small"
                   color="blue"
                   className="ml-1 font-bold"
                 >
-                  Sign up
+                  Sign in
                 </Typography>
               </Link>
             </Typography>
@@ -113,4 +131,4 @@ export function SignIn() {
   );
 }
 
-export default SignIn;
+export default SignUp;

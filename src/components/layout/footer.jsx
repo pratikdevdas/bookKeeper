@@ -118,7 +118,7 @@ Footer.defaultProps = {
     {
       name: "useful links",
       items: [
-        { name: "About Us", path: "https://www.creative-tim.com/presentation" },
+        { name: "About Us", path: "#" },
         { name: "Blog", path: "#" },
         {
           name: "Github",
@@ -143,11 +143,11 @@ Footer.defaultProps = {
         },
         {
           name: "Change Log",
-          path: "#//github.com/creativetimofficial/material-tailwind/blob/main/CHANGELOG.md?ref=mtk",
+          path: "#",
         },
         {
           name: "Contact Us",
-          path: "#//creative-tim.com/contact-us?ref=mtk",
+          path: "#",
         },
       ],
     },

@@ -5,6 +5,7 @@ import {
   BuildingLibraryIcon,
 } from "@heroicons/react/24/solid";
 import { Footer } from "@/components/layout";
+import { logout } from "@/firebase";
 
 export function Profile() {
   return (
@@ -31,7 +32,8 @@ export function Profile() {
                   </div>
                 </div>
                 <div className="mt-10 flex w-full justify-center px-4 lg:order-3 lg:mt-0 lg:w-4/12 lg:justify-end lg:self-center">
-                  <Button className="bg-blue-400">Conntect</Button>
+                  <Button className="bg-blue-400 mx-4">Upload</Button>
+                  <Button className="bg-blue-400" onClick={logout}>Log Out</Button>
                 </div>
                 <div className="w-full px-4 lg:order-1 lg:w-4/12">
                   <div className="flex justify-center py-4 pt-8 lg:pt-4">
@@ -83,7 +85,7 @@ export function Profile() {
                   </div>
                 </div>
               </div>
-              <div className="my-8 text-center">
+              <div className="my-4 text-center">
                 <Typography variant="h2" color="blue-gray" className="mb-2">
                   Jenna Stones
                 </Typography>
@@ -107,7 +109,7 @@ export function Profile() {
                 </div>
               </div>
 
-              <div className="mb-10 border-t border-blue-gray-50 py-6 text-center">
+              <div className="border-t border-blue-gray-50 py-6 text-center">
                 <div className="mt-2 flex flex-wrap justify-center">
                   <div className="flex w-full flex-col items-center px-4 lg:w-9/12">
                     <Typography className="mb-8 font-normal text-blue-gray-500">
@@ -117,7 +119,7 @@ export function Profile() {
                       warm, intimate feel with a solid groove structure. An
                       artist of considerable range.
                     </Typography>
-                    <Button variant="text">Show more</Button>
+                    <Button variant="text">All Posts</Button>
                   </div>
                 </div>
               </div>
