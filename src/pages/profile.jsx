@@ -29,6 +29,7 @@ export function Profile() {
   const [imgUrl, setImgUrl] = useState(null);
   const [progressPercent, setProgressPercent] = useState(0);
   const [data, setData] = useState(null);
+  const [notification, setNotification] = useState(null);
   const navigate = useNavigate();
   const logOut = (e) => {
     navigate("/");
@@ -37,7 +38,8 @@ export function Profile() {
 
   useEffect(() => {
     if (user) {
-      getSingleUserData(user.uid).then((user) => setData(user));
+      getSingleUserData(user.uid).then((user) => {
+        return setData(user)});
     }
   }, [user, imgUrl]);
 
@@ -68,6 +70,10 @@ export function Profile() {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           uploadImageUpdate(user.uid, downloadURL);
           setImgUrl(downloadURL);
+          setNotification('Upload Successful')
+          setTimeout(() => {
+            setNotification(' ')
+        }, 3000)
         });
       }
     );
@@ -137,6 +143,7 @@ export function Profile() {
                       <Button className="bg-blue-400" onClick={logOut}>
                         Log Out
                       </Button>
+                      <>{notification}</>
                       {imgUrl ? <></> : <>
                       <div className="outerbar">
                         <div
