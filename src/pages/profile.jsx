@@ -1,20 +1,63 @@
-import { Avatar, Typography, Button } from "@material-tailwind/react";
+import { Avatar, Typography, Button, IconButton } from "@material-tailwind/react";
 import {
   MapPinIcon,
   BriefcaseIcon,
   BuildingLibraryIcon,
 } from "@heroicons/react/24/solid";
 import { Footer } from "@/components/layout";
-import { logout } from "@/firebase";
+import { logout, auth, getAllUserData, getAllUserDataHooks } from "@/firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useCollection } from "react-firebase-hooks/firestore";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { teamData } from "@/data";
+import { FeatureCard, TeamCard } from "@/components/cards";
 
 export function Profile() {
+  const [user] = useAuthState(auth);
+  const [snapshot, loading, error] = useCollection(getAllUserDataHooks());
+  const navigate = useNavigate();
+  console.log(snapshot);
+
+  const logOut = (e) => {
+    logout();
+    navigate("/");
+  };
+  console.log(user);
+  // console.log(getUserData())
+  // useEffect((user) => getSingleUserData(user), [user])
+
+  // console.log(getSingleUserData())
+  if (!user) {
+    return (
+      <>
+        <section className="relative block h-[70vh]">
+          <div className="bg-profile-background absolute top-0 h-full w-full bg-[url('/img/background-1.jpg')] bg-cover bg-center" />
+          <div className="absolute top-0 h-full w-full bg-black/75 bg-cover bg-center" />
+        </section>
+        <section className="relative bg-blue-gray-50/50 py-16 px-4">
+          <div className="container mx-auto">
+            <div className="relative p-6 mb-6 my-4 text-center -mt-64 flex w-full min-w-0 flex-col break-words rounded-3xl bg-white shadow-xl shadow-gray-500/5">
+                  <Typography variant="h2" color="blue-gray" className="mb-2">
+                    Please Login to view this Page
+                  </Typography>
+            </div>
+          </div>
+        </section>
+        <div className="bg-blue-gray-50/50">
+          <Footer />
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <section className="relative block h-[50vh]">
         <div className="bg-profile-background absolute top-0 h-full w-full bg-[url('/img/background-1.jpg')] bg-cover bg-center" />
         <div className="absolute top-0 h-full w-full bg-black/75 bg-cover bg-center" />
       </section>
-      <section className="relative bg-blue-gray-50/50 py-16 px-4">
+      <section className="relative bg-blue-gray-50/50 py-8 px-4">
         <div className="container mx-auto">
           <div className="relative mb-6 -mt-64 flex w-full min-w-0 flex-col break-words rounded-3xl bg-white shadow-xl shadow-gray-500/5">
             <div className="px-6">
@@ -32,8 +75,10 @@ export function Profile() {
                   </div>
                 </div>
                 <div className="mt-10 flex w-full justify-center px-4 lg:order-3 lg:mt-0 lg:w-4/12 lg:justify-end lg:self-center">
-                  <Button className="bg-blue-400 mx-4">Upload</Button>
-                  <Button className="bg-blue-400" onClick={logout}>Log Out</Button>
+                  <Button className="mx-4 bg-blue-400">Upload</Button>
+                  <Button className="bg-blue-400" onClick={logOut}>
+                    Log Out
+                  </Button>
                 </div>
                 <div className="w-full px-4 lg:order-1 lg:w-4/12">
                   <div className="flex justify-center py-4 pt-8 lg:pt-4">
@@ -87,18 +132,22 @@ export function Profile() {
               </div>
               <div className="my-4 text-center">
                 <Typography variant="h2" color="blue-gray" className="mb-2">
-                  Jenna Stones
+                  {user.displayName}
                 </Typography>
                 <div className="mb-16 flex items-center justify-center gap-2">
                   <MapPinIcon className="-mt-px h-4 w-4 text-blue-gray-700" />
                   <Typography className="font-medium text-blue-gray-700">
-                    Los Angeles, California
+                    {user.emailVerified ? (
+                      <>Verified Email</>
+                    ) : (
+                      <>Email not Verified</>
+                    )}
                   </Typography>
                 </div>
                 <div className="mb-2 flex items-center justify-center gap-2">
                   <BriefcaseIcon className="-mt-px h-4 w-4 text-blue-gray-700" />
                   <Typography className="font-medium text-blue-gray-700">
-                    Solution Manager - Creative Tim Officer
+                  Web Development & Photography
                   </Typography>
                 </div>
                 <div className="mb-2 flex items-center justify-center gap-2">
@@ -118,12 +167,36 @@ export function Profile() {
                       performs and records all of his own music, giving it a
                       warm, intimate feel with a solid groove structure. An
                       artist of considerable range.
+                      Dynamic Description
                     </Typography>
                     <Button variant="text">All Posts</Button>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+      <section className="px-4 pb-48">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 gap-12 gap-x-8 md:grid-cols-2 xl:grid-cols-4">
+            {teamData.map(({ img, name, position, socials }) => (
+              <TeamCard
+                key={name}
+                img={img}
+                name={name}
+                position={position}
+                socials={
+                  <div className="flex items-center gap-2">
+                    {socials.map(({ color, name }) => (
+                      <IconButton key={name} color={color} variant="text">
+                        <i className={`fa-brands text-lg fa-${name}`} />
+                      </IconButton>
+                    ))}
+                  </div>
+                }
+              />
+            ))}
           </div>
         </div>
       </section>
