@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app';
+import { v4 as uuidv4 } from 'uuid';
 import {
   GoogleAuthProvider,
   getAuth,
@@ -17,9 +18,14 @@ import {
   getDocs,
   collection,
   setDoc,
+  updateDoc,
+  arrayUnion,
   where,
   addDoc,
 } from "firebase/firestore";
+
+import { getStorage, ref } from "firebase/storage";
+import { array } from 'prop-types';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_PUBLIC_FIREBASE_PUBLIC_API_KEY,
@@ -35,7 +41,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
-
 const signInWithGoogle = async () => {
   try {
     const res = await signInWithPopup(auth, googleProvider);
@@ -94,32 +99,30 @@ const logout = () => {
   signOut(auth);
 };
 
-const getAllUserData = async () => {
-  try {
-    const users = query(collection(db,'users'));
-     const querySnapshot = await getDocs(users)
-     querySnapshot.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
-      console.log(doc.id, " => ", doc.data());
-    });
-  } catch (err){
-    console.log(err);
-    alert(err.message);
+const getSingleUserData = async(id) => {
+  const docRef = doc(db,'users',id)
+  const docSnap = await getDoc(docRef)
+  if (docSnap.exists()) {
+    console.log("Document data:", docSnap.data());
+    return docSnap.data()
+  } else {
+    // doc.data() will be undefined in this case
+    console.log("No such document!");
   }
-}
+}; 
 
-const getSingleUserData = async () =>{
-  const docRef = doc(db, "users", "o1jlXNmOmN5rGEsmGmkZ");
-const docSnap = await getDoc(docRef);
 
-if (docSnap.exists()) {
-  console.log("Document data:", docSnap.data());
-} else {
-  // doc.data() will be undefined in this case
-  console.log("No such document!");
+const uploadImageUpdate = async(id, imgUrl) => {
+  const userRef = doc(db, "users", id);
+  const imgData = {
+    id: uuidv4(),
+    url: imgUrl
+  }
+  await updateDoc(userRef,{
+    imageData : arrayUnion(imgData)
+  });
 }
-}
-
+  
 const getAllUserDataHooks = () =>
  query(collection(db,'users'));
 
@@ -131,9 +134,10 @@ export {
   registerWithEmailAndPassword,
   sendPasswordReset,
   logout,
-  getAllUserData,
   getAllUserDataHooks,
-  getSingleUserData
+  getSingleUserData,
+  uploadImageUpdate
 };
 
 export default app;
+export const storage = getStorage(app);
