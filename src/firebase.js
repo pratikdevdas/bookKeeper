@@ -12,8 +12,11 @@ import {
 import {
   getFirestore,
   query,
+  doc,
+  getDoc,
   getDocs,
   collection,
+  setDoc,
   where,
   addDoc,
 } from "firebase/firestore";
@@ -38,9 +41,10 @@ const signInWithGoogle = async () => {
     const res = await signInWithPopup(auth, googleProvider);
     const user = res.user;
     const q = query(collection(db, "users"), where("uid", "==", user.uid));
+    console.log(q);
     const docs = await getDocs(q);
     if (docs.docs.length === 0) {
-      await addDoc(collection(db, "users"), {
+      await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         name: user.displayName,
         authProvider: "google",
@@ -65,7 +69,7 @@ const registerWithEmailAndPassword = async (name, email, password) => {
   try {
     const res = await createUserWithEmailAndPassword(auth, email, password);
     const user = res.user;
-    await addDoc(collection(db, "users"), {
+    await setDoc(doc(db, "users", user.uid), {
       uid: user.uid,
       name,
       authProvider: "local",
@@ -89,6 +93,36 @@ const sendPasswordReset = async (email) => {
 const logout = () => {
   signOut(auth);
 };
+
+const getAllUserData = async () => {
+  try {
+    const users = query(collection(db,'users'));
+     const querySnapshot = await getDocs(users)
+     querySnapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      console.log(doc.id, " => ", doc.data());
+    });
+  } catch (err){
+    console.log(err);
+    alert(err.message);
+  }
+}
+
+const getSingleUserData = async () =>{
+  const docRef = doc(db, "users", "o1jlXNmOmN5rGEsmGmkZ");
+const docSnap = await getDoc(docRef);
+
+if (docSnap.exists()) {
+  console.log("Document data:", docSnap.data());
+} else {
+  // doc.data() will be undefined in this case
+  console.log("No such document!");
+}
+}
+
+const getAllUserDataHooks = () =>
+ query(collection(db,'users'));
+
 export {
   auth,
   db,
@@ -97,6 +131,9 @@ export {
   registerWithEmailAndPassword,
   sendPasswordReset,
   logout,
+  getAllUserData,
+  getAllUserDataHooks,
+  getSingleUserData
 };
 
 export default app;
