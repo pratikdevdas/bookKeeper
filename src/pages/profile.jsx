@@ -101,9 +101,6 @@ export function Profile() {
     );
   }
 
-  const object = getSingleUserData(user.uid);
-  console.log(object);
-
   return (
     <>
       <section className="relative block h-[50vh]">

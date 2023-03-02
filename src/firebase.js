@@ -25,7 +25,6 @@ import {
 } from "firebase/firestore";
 
 import { getStorage, ref } from "firebase/storage";
-import { array } from 'prop-types';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_PUBLIC_FIREBASE_PUBLIC_API_KEY,
@@ -41,6 +40,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
+const userRef = collection(db, 'users');
+const q = query(userRef);
+
 const signInWithGoogle = async () => {
   try {
     const res = await signInWithPopup(auth, googleProvider);
@@ -129,6 +131,7 @@ const getAllUserDataHooks = () =>
 export {
   auth,
   db,
+  q,
   signInWithGoogle,
   logInWithEmailAndPassword,
   registerWithEmailAndPassword,

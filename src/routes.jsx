@@ -1,4 +1,4 @@
-import { Home, Profile, Login, SignUp } from "@/pages";
+import { Home, Profile, Login, SignUp, AdminHome } from "@/pages";
 import {
   HomeIcon,
   UserCircleIcon,
@@ -32,6 +32,13 @@ export const routes = [
     path: "/signup",
     element: <SignUp />,
   },
+  {
+    icon: UserPlusIcon,
+    name: "Admin",
+    path: "/admin",
+    element: <AdminHome />,
+  },
+
 ];
 
 export default routes;

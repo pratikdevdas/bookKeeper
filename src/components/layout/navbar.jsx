@@ -9,9 +9,16 @@ import {
   IconButton,
 } from "@material-tailwind/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useAuthState } from "react-firebase-hooks/auth";
+import {
+  logout,
+  auth,
+} from "@/firebase";
 
 export function Navbar({ brandName, routes, action }) {
   const [openNav, setOpenNav] = React.useState(false);
+  const [user] = useAuthState(auth);
+  
 
   React.useEffect(() => {
     window.addEventListener(
@@ -20,43 +27,39 @@ export function Navbar({ brandName, routes, action }) {
     );
   }, []);
 
-  const navList = (
+  const navSignInList = (
     <ul className="mb-4 mt-2 flex flex-col gap-2 text-inherit lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
-      {routes.map(({ name, path, icon, href, target }) => (
-        <Typography
-          key={name}
-          as="li"
-          variant="small"
-          color="inherit"
-          className="capitalize"
+ 
+        <Link
+          to='signin'
+          className="flex items-center gap-1 p-1 font-normal"
         >
-          {href ? (
-            <a
-              href={href}
-              target={target}
-              className="flex items-center gap-1 p-1 font-normal"
-            >
-              {icon &&
-                React.createElement(icon, {
-                  className: "w-[18px] h-[18px] opacity-75 mr-1",
-                })}
-              {name}
-            </a>
-          ) : (
-            <Link
-              to={path}
-              target={target}
-              className="flex items-center gap-1 p-1 font-normal"
-            >
-              {icon &&
-                React.createElement(icon, {
-                  className: "w-[18px] h-[18px] opacity-75 mr-1",
-                })}
-              {name}
-            </Link>
-          )}
-        </Typography>
-      ))}
+         Sign In
+        </Link>
+        <Link
+          to='login'
+          className="flex items-center gap-1 p-1 font-normal"
+        >
+         Log In 
+        </Link>
+    </ul>
+  );
+
+  const navProfileList = (
+    <ul className="mb-4 mt-2 flex flex-col gap-2 text-inherit lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
+ 
+        <Link
+          to='profile'
+          className="flex items-center gap-1 p-1 font-normal"
+        >
+         Profile
+        </Link>
+        <Link
+          to='admin'
+          className="flex items-center gap-1 p-1 font-normal"
+        >
+         Admin
+        </Link>
     </ul>
   );
 
@@ -68,7 +71,7 @@ export function Navbar({ brandName, routes, action }) {
             {brandName}
           </Typography>
         </Link>
-        <div className="hidden lg:block">{navList}</div>
+        <div className="hidden lg:block">{user ? <>{navProfileList}</>: <>{navSignInList}</>}</div>
         <div className="hidden gap-2 lg:flex">
           {React.cloneElement(action, {
             className: "hidden lg:inline-block",
@@ -93,7 +96,8 @@ export function Navbar({ brandName, routes, action }) {
         open={openNav}
       >
         <div className="container mx-auto">
-          {navList}     {React.cloneElement(action, {
+          {user ? <>{navProfileList}</>: <>{navSignInList}</>}{" "}
+          {React.cloneElement(action, {
             className: "w-full block",
           })}
         </div>
@@ -105,10 +109,7 @@ export function Navbar({ brandName, routes, action }) {
 Navbar.defaultProps = {
   brandName: "Photo App",
   action: (
-    <a
-      href="https://www.pratikdevdas.com"
-      target="_blank"
-    >
+    <a href="https://www.pratikdevdas.com" target="_blank">
       <Button variant="gradient" size="sm" fullWidth>
         About Us
       </Button>
